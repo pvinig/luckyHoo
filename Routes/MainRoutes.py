@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from schemas.Serializers import *
+# from schemas.Auth import *
 from Models.UserModel import *
 from Data.db import connection
 # from bson import ObjectId
@@ -15,11 +16,19 @@ async def ola():
 async def GetUsers():
      return serializeList(connection.local.user.find())
  
-@api.post("/newbie")
-async def CreateUser(user: User):
-
-
+@api.post("/Register")
+async def Register(user: Userlogin, cpwd: str):
+    if connection.local.user.find_one({"email": user.email }): 
+        return Exception("Email ja cadastrado")
+    elif user.pwd != cpwd :
+        return Exception("as senhas nao batem")
+    
     connection.local.user.insert_one(dict(user))
-    usuario = serializeDict(user)  
-     
-    return usuario
+    
+    return user
+  
+@api.post("/login")
+async def Login(user: Userlogin):
+    if connection.local.user.find_one(dict(user)):
+        return [200, {"email": user.email}]
+    return Exception("email ou senha incorretos!")
