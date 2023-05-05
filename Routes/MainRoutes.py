@@ -7,26 +7,32 @@ from Data.db import connection
 
 api = APIRouter()
 
+
 @api.get('/')
 async def ola():
     ola = "ola"
     return ola
 
+
 @api.get("/allUsers")
 async def GetUsers():
-     return serializeList(connection.local.user.find())
- 
+    x = serializeList(connection.local.user.find())
+
+    return x
+
+
 @api.post("/Register")
 async def Register(user: Userlogin, cpwd: str):
-    if connection.local.user.find_one({"email": user.email }): 
+    if connection.local.user.find_one({user.email}):
         return Exception("Email ja cadastrado")
-    elif user.pwd != cpwd :
+    elif user.pwd != cpwd:
         return Exception("as senhas nao batem")
-    
+
     connection.local.user.insert_one(dict(user))
-    
+
     return user
-  
+
+
 @api.post("/login")
 async def Login(user: Userlogin):
     if connection.local.user.find_one(dict(user)):

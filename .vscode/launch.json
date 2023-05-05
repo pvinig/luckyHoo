@@ -5,17 +5,19 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "Python: FastAPI",
+            "module": "uvicorn",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
+            "args": [
+                "main:app",
+                "--reload",
+            ],
             "console": "integratedTerminal",
-            "justMyCode": true
-        }
-    ],
-    "scripts": [
-        {
-            "run": "uvicorn main:app --reload"
+            "justMyCode": true,
+            "env": {
+                "path": "env/bin/activate"
+            }
         }
     ]
 }
