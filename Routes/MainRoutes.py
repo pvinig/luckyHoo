@@ -1,14 +1,17 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Form, File
 from schemas.Serializers import *
+
 # from schemas.Auth import *
 from Models.UserModel import *
 from Data.db import connection
+from typing import Annotated
+
 # from bson import ObjectId
 
 api = APIRouter()
 
 
-@api.get('/')
+@api.get("/")
 async def ola():
     ola = "ola"
     return ola
@@ -16,21 +19,20 @@ async def ola():
 
 @api.get("/allUsers")
 async def GetUsers():
-    x = serializeList(connection.local.user.find())
-
-    return x
+    return serializeList(connection.local.user.find())
 
 
 @api.post("/Register")
-async def Register(user: Userlogin, cpwd: str):
-    if connection.local.user.find_one({user.email}):
-        return Exception("Email ja cadastrado")
-    elif user.pwd != cpwd:
-        return Exception("as senhas nao batem")
+async def Register(user: userRegister = Form(...)):
+    new_user = {"email": f"{user.email}", "pwd": f"{user.pwd}"}
 
-    connection.local.user.insert_one(dict(user))
+    AlreadyIn = connection.local.user.find(new_user[0])
+    if AlreadyIn:
+        raise ValueError("email ja cadastrado")
 
-    return user
+    connection.local.user.insert_one(new_user)
+
+    return new_user
 
 
 @api.post("/login")
