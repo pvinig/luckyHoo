@@ -1,20 +1,20 @@
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, EmailStr
 from Data.db import connection
 
 
 class User(BaseModel):
     _id: str
-    email: str
+    email: EmailStr
     pwd: str
 
 
 class Userlogin(BaseModel):
-    email: str
+    email: EmailStr
     pwd: str
 
 
 class userRegister(BaseModel):
-    email: str
+    email: EmailStr
     pwd: str
     comfirm_pwd: str
 

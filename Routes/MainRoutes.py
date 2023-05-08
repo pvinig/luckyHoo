@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Form, File
 from schemas.Serializers import *
+from bson import ObjectId
 
 # from schemas.Auth import *
 from Models.UserModel import *
@@ -23,14 +24,13 @@ async def GetUsers():
 
 
 @api.post("/Register")
-async def Register(user: userRegister = Form(...)):
-    new_user = {"email": f"{user.email}", "pwd": f"{user.pwd}"}
-
-    AlreadyIn = connection.local.user.find(new_user[0])
+async def Register(user: userRegister):
+    new_user = Userlogin(email=user.email, pwd=user.pwd)
+    AlreadyIn = connection.local.user.find_one({"email": user.email})
     if AlreadyIn:
         raise ValueError("email ja cadastrado")
 
-    connection.local.user.insert_one(new_user)
+    connection.local.user.insert_one(dict(new_user))
 
     return new_user
 
@@ -40,3 +40,10 @@ async def Login(user: Userlogin):
     if connection.local.user.find_one(dict(user)):
         return [200, {"email": user.email}]
     return Exception("email ou senha incorretos!")
+
+
+@api.delete("/{id}")
+async def delete_user(id):
+    return serializeDict(
+        connection.local.user.find_one_and_delete({"_id": ObjectId(id)})
+    )
