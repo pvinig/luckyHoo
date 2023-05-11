@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Form, File
-from schemas.Serializers import *
-from bson import ObjectId
+from src.schemas.Serializers import *
+from src.schemas.jwt import *
+from bson import ObjectId, objectid
 
 # from schemas.Auth import *
-from Models.UserModel import *
-from Data.db import connection
+from src.Models.user import *
+from src.Data.db import connection
 from typing import Annotated
 
 # from bson import ObjectId
@@ -14,6 +15,7 @@ api = APIRouter()
 
 @api.get("/")
 async def ola():
+    connection.local.user.__new__
     ola = "ola"
     return ola
 
@@ -37,8 +39,10 @@ async def Register(user: userRegister):
 
 @api.post("/login")
 async def Login(user: Userlogin):
-    if connection.local.user.find_one(dict(user)):
-        return [200, {"email": user.email}]
+    login = connection.local.user.find_one(dict(user))
+
+    if login:
+        return generate_token(login["email"])
     return Exception("email ou senha incorretos!")
 
 

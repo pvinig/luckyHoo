@@ -1,5 +1,5 @@
 from pydantic import BaseModel, validator, EmailStr
-from Data.db import connection
+from src.Data.db import connection
 
 
 class User(BaseModel):
