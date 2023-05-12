@@ -3,19 +3,16 @@ from src.schemas.Serializers import *
 from src.schemas.jwt import *
 from bson import ObjectId, objectid
 
-# from schemas.Auth import *
 from src.Models.user import *
 from src.Data.db import connection
 from typing import Annotated
 
-# from bson import ObjectId
 
 api = APIRouter()
 
 
 @api.get("/")
 async def ola():
-    connection.local.user.__new__
     ola = "ola"
     return ola
 
@@ -27,10 +24,12 @@ async def GetUsers():
 
 @api.post("/Register")
 async def Register(user: userRegister):
-    new_user = Userlogin(email=user.email, pwd=user.pwd)
     AlreadyIn = connection.local.user.find_one({"email": user.email})
     if AlreadyIn:
         raise ValueError("email ja cadastrado")
+
+    pwd = Encode(user.pwd)
+    new_user = Userlogin(email=user.email, pwd=pwd)
 
     connection.local.user.insert_one(dict(new_user))
 
@@ -39,11 +38,14 @@ async def Register(user: userRegister):
 
 @api.post("/login")
 async def Login(user: Userlogin):
+    user.pwd = Decode(user.pwd)
     login = connection.local.user.find_one(dict(user))
 
     if login:
-        return generate_token(login["email"])
-    return Exception("email ou senha incorretos!")
+        token = generate_token(login["email"])
+        if token:
+            return token
+    raise Exception("email ou senha incorretos!")
 
 
 @api.delete("/{id}")
