@@ -15,14 +15,10 @@ secret = Fernet(key)
 token_timeout = 7 * 24 * 3600
 
 
-def generate_token(user_id: str):
-    private_key = "asdd3edadsd23frfedws"
+def generate_token(user_email: str):
     header = {"alg": "RS256"}
-    key = Fernet.generate_key()
-    f = Fernet(key)
-
-    payload = {"user_id": user_id, "exp": int(time.time() + token_timeout)}
-    token = jwt.encode(header, payload, f)
+    payload = {"email": user_email, "exp": int(time.time() + token_timeout)}
+    token = jwt.encode(header, payload, secret)
     return token.decode("utf-8")
 
 
@@ -32,5 +28,5 @@ def Encode(key: str):
 
 
 def Decode(key: str):
-    token = secret.decrypt(key.encode())
-    return token.decode()
+    token = secret.decrypt(key)
+    return token.decode('utf-8')

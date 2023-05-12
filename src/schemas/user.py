@@ -1,7 +1,6 @@
-from Data.db import connection
-from Models.user import *
-from cryptography.fernet import Fernet
-from cryptography.exceptions import AlreadyFinalized
+from src.Data.db import connection
+from src.Models.user import *
+from src.schemas.jwt import Decode
 
 
 def get_user():
@@ -10,3 +9,10 @@ def get_user():
 
 def check_pwd():
     return
+
+async def check_login(user: Userlogin):
+    who = connection.local.user.find_one(user.email)
+    key = who
+    if who and key == user.pwd:
+        return True
+    raise Exception('email ou senha nao conferem')

@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Form, File
-from src.schemas.Serializers import *
 from src.schemas.jwt import *
+from src.schemas.Serializers import *
+from src.schemas.user import *
 from bson import ObjectId, objectid
 
 from src.Models.user import *
@@ -38,11 +39,9 @@ async def Register(user: userRegister):
 
 @api.post("/login")
 async def Login(user: Userlogin):
-    user.pwd = Decode(user.pwd)
-    login = connection.local.user.find_one(dict(user))
-
-    if login:
-        token = generate_token(login["email"])
+    
+    if await check_login(user):
+        token = generate_token(user.email.__str__())
         if token:
             return token
     raise Exception("email ou senha incorretos!")
